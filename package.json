@@ -1,0 +1,23 @@
+{
+    "name": "junk2clean-website",
+    "version": "1.0.0",
+    "description": "Junk2CLEAN - Eco-friendly junk removal service website",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node server.js"
+    },
+    "engines": {
+        "node": ">=18.x"
+    },
+    "keywords": [
+        "junk-removal",
+        "website",
+        "static-site"
+    ],
+    "author": "Junk2CLEAN",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.18.2"
+    }
+}
