@@ -1,6 +1,15 @@
 # Junk2CLEAN Website
 
-Eco-friendly junk removal service website - built with HTML, CSS, and JavaScript, served via Express.
+Eco-friendly junk removal service website with modern hamburger navigation - built with HTML, CSS, and JavaScript, served via Express.
+
+## ✨ Features
+
+- 🍔 **Hamburger Navigation Menu** - Smooth slide-in navigation on all devices
+- 📄 **Multi-Page Site** - Home, About Us, Pricing, and Contact pages
+- 🎨 **Beautiful Design** - Desert-themed gradients with modern UI/UX
+- 📱 **Fully Responsive** - Mobile-first design that works on all screen sizes
+- 🔍 **SEO Optimized** - Complete meta tags, Open Graph, and structured data
+- ♿ **Accessible** - ARIA labels and keyboard navigation support
 
 ## 🚀 Deploy to Railway
 
@@ -52,13 +61,25 @@ The site will be available at `http://localhost:3000`
 
 ```
 .
-├── index.html              # Main website HTML
-├── server.js               # Express server configuration
+├── index.html              # Home page
+├── about.html              # About Us page
+├── pricing.html            # Pricing page
+├── contact.html            # Contact page
+├── server.js               # Express server with routing
 ├── package.json            # Node.js dependencies
 ├── Junk2CLEAN Logo Design.png  # Logo image
-├── .gitignore             # Git ignore rules
-└── README.md              # This file
+├── QUICK_START.md          # Quick start guide
+├── IMPLEMENTATION_SUMMARY.md  # Implementation details
+├── .gitignore              # Git ignore rules
+└── README.md               # This file
 ```
+
+## 🌐 Pages
+
+- **Home** (`/`) - Hero section, services overview, testimonials, FAQ
+- **About Us** (`/about.html`) - Company story, mission, values, impact
+- **Pricing** (`/pricing.html`) - Transparent pricing tiers and details
+- **Contact** (`/contact.html`) - Contact form, info, and service areas
 
 ## 🔧 Configuration
 
@@ -66,10 +87,21 @@ The server uses the `PORT` environment variable (automatically set by Railway). 
 
 ## 📝 Notes
 
-- The site is fully static with no backend required
-- Express serves the HTML and static assets
-- All styling and JavaScript are inline in `index.html`
+- Multi-page site with hamburger navigation menu
+- All pages are static with no backend required
+- Express serves HTML pages and static assets with proper routing
+- All styling and JavaScript are inline in each HTML page
+- Fully SEO optimized with meta tags and structured data
+- Mobile-first responsive design
 - Environment-friendly with minimal dependencies
+
+## 🎨 Customization
+
+See `QUICK_START.md` for details on:
+- Updating contact information
+- Changing colors and branding
+- Adding Google Analytics
+- Connecting the contact form
 
 ## 📞 Support
 
