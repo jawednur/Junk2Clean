@@ -592,50 +592,49 @@
       background: rgba(255, 255, 255, 0.95);
     }
 
-    /* Hero Image Placeholder */
+    /* Hero Image */
     .scene {
       position: relative;
-      height: 400px;
-      max-height: 40vh;
+      height: 500px;
+      max-height: 60vh;
       animation: fadeIn 1s ease-out 0.5s both;
       border-radius: 24px;
       overflow: hidden;
-      background: linear-gradient(135deg, var(--teal-light) 0%, var(--teal) 50%, var(--steel) 100%);
       box-shadow: 0 20px 60px rgba(61, 110, 122, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    }
+
+    @media (min-width: 768px) {
+      .scene {
+        height: 600px;
+        max-height: 65vh;
+      }
     }
 
     @media (min-width: 900px) {
       .scene {
-        height: 480px;
+        height: 650px;
+        max-height: 70vh;
       }
     }
 
-    .scene::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(45deg,
-          transparent,
-          transparent 10px,
-          rgba(255, 255, 255, 0.03) 10px,
-          rgba(255, 255, 255, 0.03) 20px);
-      animation: shimmer 20s linear infinite;
+    @media (min-width: 1200px) {
+      .scene {
+        height: 700px;
+        max-height: 75vh;
+      }
     }
 
-    .scene::after {
-      content: 'Hero Image Placeholder';
-      position: relative;
-      z-index: 1;
-      font-family: "Sora", sans-serif;
-      font-size: var(--text-xl);
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.4);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+    .scene img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .scene:hover img {
+      transform: scale(1.02);
     }
 
     .float {
@@ -1467,7 +1466,11 @@
           </span>
         </div>
       </div>
-      <div class="scene" aria-hidden="true"></div>
+      <div class="scene">
+        <img src="hero-desert.jpg"
+          alt="Beautiful desert rock formations with layered sedimentary rocks in warm orange, red, and tan colors under a blue sky"
+          loading="lazy" />
+      </div>
     </div>
   </section>
 
