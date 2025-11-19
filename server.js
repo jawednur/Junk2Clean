@@ -106,7 +106,7 @@ const upload = multer({
 
 // Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'junk2clean-admin-secret-change-in-production',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     name: 'sessionId', // Don't use default name
