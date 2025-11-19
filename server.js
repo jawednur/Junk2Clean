@@ -1,4 +1,5 @@
 const express = require('express');
+app.set('trust proxy', true);
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const helmet = require('helmet');
@@ -118,13 +119,13 @@ app.use(session({
     }
 }));
 
-// Generate proper password hash for admin
-const ADMIN_PASSWORD_HASH = bcrypt.hashSync('admin123', 10);
+// Generate proper password hash for admin using env variable only (no fallback)
+const ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
 
 // Admin credentials
 const ADMIN_CREDENTIALS = {
-    username: process.env.ADMIN_USERNAME || 'admin',
-    passwordHash: process.env.ADMIN_PASSWORD_HASH || ADMIN_PASSWORD_HASH
+    username: process.env.ADMIN_USERNAME ,
+    passwordHash: process.env.ADMIN_PASSWORD_HASH 
 };
 
 // Authentication middleware
