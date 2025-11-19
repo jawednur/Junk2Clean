@@ -30,3 +30,7 @@ Thumbs.db
 *.swo
 *~
 
+
+# Uploaded images
+data/uploads/*
+!data/uploads/.gitkeep

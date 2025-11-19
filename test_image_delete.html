@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Delete Functionality</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin: 20px 0; }
+        .preview { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #ccc; }
+        .preview img { width: 100%; height: 100px; object-fit: cover; }
+        .preview button { position: absolute; top: 4px; right: 4px; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1; }
+        input[type="file"] { margin: 10px 0; }
+        #output { margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Test Image Delete Functionality</h1>
+    <p>Select multiple images, delete some previews, then click "Test Upload" to see which files would actually be uploaded.</p>
+
+    <input type="file" id="images" accept="image/*" multiple />
+    <div id="imagePreview" class="preview-container"></div>
+    <button id="testBtn">Test Upload Logic</button>
+    <div id="output"></div>
+
+    <script>
+        const imageInput = document.getElementById('images');
+        const imagePreview = document.getElementById('imagePreview');
+        const testBtn = document.getElementById('testBtn');
+        const output = document.getElementById('output');
+
+        // Track files that should actually be uploaded (separate from input.files which is read-only)
+        let filesToUpload = [];
+
+        // Image preview functionality
+        imageInput.addEventListener('change', (e) => {
+            imagePreview.innerHTML = '';
+            const files = Array.from(e.target.files);
+
+            if (files.length > 5) {
+                alert('Maximum 5 images allowed');
+                imageInput.value = '';
+                return;
+            }
+
+            // Reset files to upload list
+            filesToUpload = [];
+
+            files.forEach((file, index) => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`Image ${index + 1} is too large. Maximum size is 5MB.`);
+                    return;
+                }
+
+                // Add file to upload list
+                filesToUpload.push(file);
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const preview = document.createElement('div');
+                    preview.className = 'preview';
+                    preview.setAttribute('data-index', index);
+                    preview.innerHTML = `
+                        <img src="${event.target.result}">
+                        <button type="button" onclick="this.parentElement.remove(); removeFromUpload(${index});">×</button>
+                    `;
+                    imagePreview.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Function to remove a file from the upload list when preview is deleted
+        function removeFromUpload(index) {
+            filesToUpload = filesToUpload.filter((file, i) => i !== index);
+            // Re-index remaining previews after removal
+            const previews = imagePreview.querySelectorAll('.preview');
+            previews.forEach((preview, newIndex) => {
+                preview.setAttribute('data-index', newIndex);
+                const button = preview.querySelector('button');
+                if (button) {
+                    button.onclick = () => { preview.remove(); removeFromUpload(newIndex); };
+                }
+            });
+        }
+
+        // Test the upload logic
+        testBtn.addEventListener('click', () => {
+            output.innerHTML = '<h3>Files that would be uploaded:</h3>';
+
+            if (filesToUpload.length === 0) {
+                output.innerHTML += '<p>No files to upload</p>';
+                return;
+            }
+
+            filesToUpload.forEach((file, index) => {
+                output.innerHTML += `<p>${index + 1}. ${file.name} (${(file.size / 1024).toFixed(1)} KB)</p>`;
+            });
+
+            output.innerHTML += `<p><strong>Total: ${filesToUpload.length} file${filesToUpload.length > 1 ? 's' : ''}</strong></p>`;
+        });
+    </script>
+</body>
+</html>

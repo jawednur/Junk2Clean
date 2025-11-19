@@ -22,12 +22,12 @@
         content="contact junk removal, junk removal Phoenix contact, free junk removal estimate, schedule junk pickup, junk removal quote Phoenix, same-day junk removal" />
     <meta name="author" content="Junk2CLEAN" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <link rel="canonical" href="https://www.junk2clean.com/contact.html" />
+    <link rel="canonical" href="https://www.junk2clean.com/contact" />
     <meta name="theme-color" content="#5B9BA8" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.junk2clean.com/contact.html" />
+    <meta property="og:url" content="https://www.junk2clean.com/contact" />
     <meta property="og:title" content="Contact Junk2CLEAN – Get Your Free Estimate Today" />
     <meta property="og:description"
         content="Get your free junk removal estimate. Call us at (555) 123-4567 or fill out our quick form. Same-day service available!" />
@@ -37,7 +37,7 @@
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://www.junk2clean.com/contact.html" />
+    <meta property="twitter:url" content="https://www.junk2clean.com/contact" />
     <meta property="twitter:title" content="Contact Junk2CLEAN – Get Your Free Estimate Today" />
     <meta property="twitter:description"
         content="Fast, eco-friendly junk removal service. Get your free estimate today!" />
@@ -78,6 +78,7 @@
             --bone: #FFFAF3;
             --accent: #2E7D32;
             --accent-light: #43A047;
+            --danger: #dc3545;
 
             /* Spacing system */
             --space-xs: 0.25rem;
@@ -837,21 +838,21 @@
     <!-- Header -->
   <header>
     <div class="container nav" role="navigation" aria-label="Primary">
-      <a href="index.html" class="logo" aria-label="Junk2CLEAN home">
+      <a href="/" class="logo" aria-label="Junk2CLEAN home">
         <img src="Junk2CLEAN Logo Design.png" alt="Junk2CLEAN" class="mark" />
       </a>
       
       <!-- Desktop Navigation Tabs (shows on large screens) -->
       <nav class="nav-tabs" aria-label="Main navigation">
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="pricing.html">Pricing</a>
-        <a href="contact.html" class="active">Contact</a>
+        <a href="/">Home</a>
+        <a href="/about">About Us</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/contact" class="active">Contact</a>
       </nav>
 
       <!-- Desktop CTA -->
       <div class="nav-cta-desktop">
-        <a class="btn btn-primary" href="contact.html" aria-label="Get free estimate">Get Free Estimate</a>
+        <a class="btn btn-primary" href="/contact" aria-label="Get free estimate">Get Free Estimate</a>
       </div>
 
       <!-- Mobile Hamburger (shows on small screens) -->
@@ -867,10 +868,10 @@
     <div class="nav-overlay"></div>
     <nav class="nav-menu" aria-label="Main navigation">
         <ul class="nav-menu-list">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
-            <li><a href="contact.html" class="active">Contact Us</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/pricing">Pricing</a></li>
+            <li><a href="/contact" class="active">Contact Us</a></li>
         </ul>
         <div class="nav-menu-contact">
             <h3>Get in Touch</h3>
@@ -890,7 +891,7 @@
                 </svg>
                 hello@junk2clean.com
             </a>
-            <a href="contact.html" class="btn btn-primary" style="margin-top: var(--space-md); text-align: center;">Get
+            <a href="/contact" class="btn btn-primary" style="margin-top: var(--space-md); text-align: center;">Get
                 Free Estimate</a>
         </div>
     </nav>
@@ -912,8 +913,7 @@
                 <h2 class="section-title">Request Free Estimate</h2>
                 <p class="muted">Fill out this form and we'll respond within minutes with your quote and available
                     pickup times.</p>
-                <form aria-label="Contact form"
-                    onsubmit="event.preventDefault(); document.getElementById('formResult').hidden=false; this.reset();">
+                <form aria-label="Contact form" id="contactForm">
                     <div class="fields">
                         <div>
                             <label for="name">Your Name *</label>
@@ -958,10 +958,27 @@
                         <textarea id="location" name="location" rows="3"
                             placeholder="Example: Items are in the garage on ground level with easy access"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="submit" style="width: 100%;">Get My Free Estimate →</button>
+                    <div>
+                        <label for="images">Upload Photos (Optional)</label>
+                        <p class="small" style="margin-bottom: var(--space-sm); color: var(--ink-soft);">
+                            Help us provide a more accurate estimate by uploading photos of the items. Up to 5 images, max 5MB each.
+                        </p>
+                        <input 
+                            type="file" 
+                            id="images" 
+                            name="images" 
+                            accept="image/*" 
+                            multiple 
+                            style="padding: var(--space-md); border: 2px dashed rgba(91, 155, 168, 0.3); background: rgba(232, 244, 248, 0.3); cursor: pointer;"
+                        />
+                        <div id="imagePreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: var(--space-sm); margin-top: var(--space-sm);"></div>
+                    </div>
+                    <button class="btn btn-primary" type="submit" id="submitBtn" style="width: 100%;">Get My Free Estimate →</button>
                     <p id="formResult" class="small" hidden
                         style="color: var(--accent); font-weight: 600; margin-top: var(--space-md);">✓ Thank you! We'll
                         text and email you shortly with your estimate.</p>
+                    <p id="formError" class="small" hidden
+                        style="color: var(--danger); font-weight: 600; margin-top: var(--space-md);">✗ Sorry, there was an error submitting your request. Please try again or call us directly.</p>
                 </form>
             </div>
 
@@ -1188,6 +1205,130 @@
         const dateInput = document.getElementById('when');
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
+
+        // Handle contact form submission
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formResult = document.getElementById('formResult');
+        const formError = document.getElementById('formError');
+        const imageInput = document.getElementById('images');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // Track files that should actually be uploaded (separate from input.files which is read-only)
+        let filesToUpload = [];
+
+        // Image preview functionality
+        imageInput.addEventListener('change', (e) => {
+            imagePreview.innerHTML = '';
+            const files = Array.from(e.target.files);
+
+            if (files.length > 5) {
+                alert('Maximum 5 images allowed');
+                imageInput.value = '';
+                return;
+            }
+
+            // Reset files to upload list
+            filesToUpload = [];
+
+            files.forEach((file, index) => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`Image ${index + 1} is too large. Maximum size is 5MB.`);
+                    return;
+                }
+
+                // Add file to upload list
+                filesToUpload.push(file);
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const preview = document.createElement('div');
+                    preview.style.cssText = 'position: relative; border-radius: 8px; overflow: hidden; border: 2px solid var(--sky);';
+                    preview.setAttribute('data-index', index);
+                    preview.innerHTML = `
+                        <img src="${event.target.result}" style="width: 100%; height: 100px; object-fit: cover;">
+                        <button type="button" onclick="removeFromUpload(${index}); this.parentElement.remove();" style="position: absolute; top: 4px; right: 4px; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1;">×</button>
+                    `;
+                    imagePreview.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Function to remove a file from the upload list when preview is deleted
+        function removeFromUpload(index) {
+            filesToUpload = filesToUpload.filter((file, i) => i !== index);
+            // Re-index remaining previews after removal
+            const previews = imagePreview.querySelectorAll('div[data-index]');
+            previews.forEach((preview, newIndex) => {
+                preview.setAttribute('data-index', newIndex);
+                const button = preview.querySelector('button');
+                if (button) {
+                    button.onclick = () => { removeFromUpload(newIndex); preview.remove(); };
+                }
+            });
+        }
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Create FormData to handle file uploads, but use our filtered filesToUpload array
+            const formData = new FormData();
+
+            // Add form fields
+            const formElements = contactForm.querySelectorAll('input, textarea, select');
+            formElements.forEach(element => {
+                if (element.name && element.value && element !== imageInput) {
+                    formData.append(element.name, element.value);
+                }
+            });
+
+            // Add only the files that weren't deleted from preview
+            filesToUpload.forEach((file, index) => {
+                formData.append('images', file);
+            });
+
+            // Disable submit button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            formResult.hidden = true;
+            formError.hidden = true;
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    body: formData // Send as FormData, not JSON
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success
+                    const imageMsg = result.imageCount > 0 ? ` (${result.imageCount} image${result.imageCount > 1 ? 's' : ''} uploaded)` : '';
+                    formResult.textContent = `✓ Thank you! We'll text and email you shortly with your estimate.${imageMsg}`;
+                    formResult.hidden = false;
+                    contactForm.reset();
+                    imagePreview.innerHTML = '';
+                    filesToUpload = []; // Clear the upload list
+                    submitBtn.textContent = '✓ Sent Successfully!';
+                    submitBtn.style.background = 'linear-gradient(135deg, #43A047, #2E7D32)';
+
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Get My Free Estimate →';
+                        submitBtn.style.background = '';
+                        formResult.hidden = true;
+                    }, 3000);
+                } else {
+                    throw new Error(result.message || 'Failed to submit form');
+                }
+            } catch (error) {
+                formError.hidden = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Get My Free Estimate →';
+            }
+        });
     </script>
 </body>
 
