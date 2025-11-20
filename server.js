@@ -7,6 +7,7 @@ const validator = require('validator');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { testConnection, initializeDatabase, ContactDB } = require('./database');
 
 const app = express();
 
@@ -271,25 +272,18 @@ app.get('/api/admin/auth-check', (req, res) => {
 });
 
 // Get all contacts (protected)
-app.get('/api/admin/contacts', requireAuth, (req, res) => {
+app.get('/api/admin/contacts', requireAuth, async (req, res) => {
     try {
-        const contactsFile = path.join(__dirname, 'data', 'contacts.json');
-
-        if (!fs.existsSync(contactsFile)) {
-            return res.json([]);
-        }
-
-        const data = fs.readFileSync(contactsFile, 'utf8');
-        const contacts = JSON.parse(data);
-
+        const contacts = await ContactDB.getAll();
         res.json(contacts);
     } catch (error) {
+        console.error('Failed to load contacts:', error);
         res.status(500).json({ error: 'Failed to load contacts' });
     }
 });
 
 // Update contact status (protected)
-app.patch('/api/admin/contacts/:id', requireAuth, (req, res) => {
+app.patch('/api/admin/contacts/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
@@ -304,33 +298,19 @@ app.patch('/api/admin/contacts/:id', requireAuth, (req, res) => {
             return res.status(400).json({ error: 'Invalid status value' });
         }
 
-        const contactsFile = path.join(__dirname, 'data', 'contacts.json');
-
-        if (!fs.existsSync(contactsFile)) {
-            return res.status(404).json({ error: 'Contacts file not found' });
-        }
-
-        const data = fs.readFileSync(contactsFile, 'utf8');
-        let contacts = JSON.parse(data);
-
-        const contactIndex = contacts.findIndex(c => c.id === id);
-
-        if (contactIndex === -1) {
+        const contact = await ContactDB.updateStatus(id, status);
+        res.json({ success: true, contact });
+    } catch (error) {
+        console.error('Failed to update contact:', error);
+        if (error.message === 'Contact not found') {
             return res.status(404).json({ error: 'Contact not found' });
         }
-
-        contacts[contactIndex].status = status;
-
-        fs.writeFileSync(contactsFile, JSON.stringify(contacts, null, 2));
-
-        res.json({ success: true, contact: contacts[contactIndex] });
-    } catch (error) {
         res.status(500).json({ error: 'Failed to update contact' });
     }
 });
 
 // Delete contact (protected)
-app.delete('/api/admin/contacts/:id', requireAuth, (req, res) => {
+app.delete('/api/admin/contacts/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -339,51 +319,24 @@ app.delete('/api/admin/contacts/:id', requireAuth, (req, res) => {
             return res.status(400).json({ error: 'Invalid ID format' });
         }
 
-        const contactsFile = path.join(__dirname, 'data', 'contacts.json');
-
-        if (!fs.existsSync(contactsFile)) {
-            return res.status(404).json({ error: 'Contacts file not found' });
-        }
-
-        const data = fs.readFileSync(contactsFile, 'utf8');
-        let contacts = JSON.parse(data);
-
-        const originalLength = contacts.length;
-        contacts = contacts.filter(c => c.id !== id);
-
-        if (contacts.length === originalLength) {
-            return res.status(404).json({ error: 'Contact not found' });
-        }
-
-        fs.writeFileSync(contactsFile, JSON.stringify(contacts, null, 2));
-
+        await ContactDB.delete(id);
         res.json({ success: true, message: 'Contact deleted' });
     } catch (error) {
+        console.error('Failed to delete contact:', error);
+        if (error.message === 'Contact not found') {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
         res.status(500).json({ error: 'Failed to delete contact' });
     }
 });
 
 // Get statistics (protected)
-app.get('/api/admin/stats', requireAuth, (req, res) => {
+app.get('/api/admin/stats', requireAuth, async (req, res) => {
     try {
-        const contactsFile = path.join(__dirname, 'data', 'contacts.json');
-
-        if (!fs.existsSync(contactsFile)) {
-            return res.json({ total: 0, new: 0, contacted: 0, completed: 0 });
-        }
-
-        const data = fs.readFileSync(contactsFile, 'utf8');
-        const contacts = JSON.parse(data);
-
-        const stats = {
-            total: contacts.length,
-            new: contacts.filter(c => c.status === 'new').length,
-            contacted: contacts.filter(c => c.status === 'contacted').length,
-            completed: contacts.filter(c => c.status === 'completed').length
-        };
-
+        const stats = await ContactDB.getStats();
         res.json(stats);
     } catch (error) {
+        console.error('Failed to load statistics:', error);
         res.status(500).json({ error: 'Failed to load statistics' });
     }
 });
@@ -451,7 +404,7 @@ app.get('/contact.html', (req, res) => {
 });
 
 // Contact form submission endpoint with validation
-app.post('/api/contact', contactLimiter, upload.array('images', 5), (req, res) => {
+app.post('/api/contact', contactLimiter, upload.array('images', 5), async (req, res) => {
     try {
         // Validate required fields
         if (!req.body.name || !req.body.phone || !req.body.zip || !req.body.when || !req.body.items) {
@@ -519,15 +472,6 @@ app.post('/api/contact', contactLimiter, upload.array('images', 5), (req, res) =
             });
         }
 
-        const contactsFile = path.join(__dirname, 'data', 'contacts.json');
-
-        // Read existing contacts
-        let contacts = [];
-        if (fs.existsSync(contactsFile)) {
-            const data = fs.readFileSync(contactsFile, 'utf8');
-            contacts = JSON.parse(data);
-        }
-
         // Process uploaded images securely
         const images = req.files ? req.files.map(file => ({
             filename: path.basename(file.filename), // Prevent path traversal
@@ -537,10 +481,14 @@ app.post('/api/contact', contactLimiter, upload.array('images', 5), (req, res) =
             mimetype: file.mimetype
         })) : [];
 
-        // Create new contact entry
-        const newContact = {
-            id: Date.now().toString(),
-            timestamp: new Date().toISOString(),
+        // Ensure data directory exists for uploads
+        const dataDir = path.join(__dirname, 'data');
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
+        }
+
+        // Create new contact entry in database
+        const contactData = {
             name,
             phone,
             email,
@@ -549,21 +497,10 @@ app.post('/api/contact', contactLimiter, upload.array('images', 5), (req, res) =
             preferredTime,
             items,
             location,
-            images,
-            status: 'new'
+            images
         };
 
-        // Add to contacts array
-        contacts.unshift(newContact);
-
-        // Ensure data directory exists
-        const dataDir = path.join(__dirname, 'data');
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
-
-        // Save to file with proper error handling
-        fs.writeFileSync(contactsFile, JSON.stringify(contacts, null, 2), { mode: 0o600 });
+        const newContact = await ContactDB.create(contactData);
 
         // Notify admin panel
         notifyAdminPanel();
@@ -677,14 +614,35 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: message });
 });
 
-// Start server
-app.listen(PORT, () => {
-    if (!IS_PRODUCTION) {
-        console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-        console.log(`🔐 Admin: http://localhost:${PORT}/admin`);
-        console.log(`⚠️  Change admin credentials before production!\n`);
+// Initialize database and start server
+async function startServer() {
+    try {
+        // Test database connection
+        await testConnection();
+
+        // Initialize database schema
+        await initializeDatabase();
+
+        // Start server
+        app.listen(PORT, () => {
+            if (!IS_PRODUCTION) {
+                console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+                console.log(`🔐 Admin: http://localhost:${PORT}/admin`);
+                console.log(`💾 Database: PostgreSQL connected`);
+                console.log(`⚠️  Change admin credentials before production!\n`);
+            } else {
+                console.log(`🚀 Server running on port ${PORT}`);
+                console.log(`💾 Database: PostgreSQL connected`);
+            }
+        });
+    } catch (error) {
+        console.error('❌ Failed to start server:', error.message);
+        process.exit(1);
     }
-});
+}
+
+// Start the server
+startServer();
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
