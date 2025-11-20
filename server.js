@@ -11,7 +11,14 @@ const fs = require('fs');
 const app = express();
 
 // Trust Railway's proxy for proper rate limiting and IP detection
-app.set('trust proxy', true);
+// Railway-specific proxy configuration
+if (process.env.RAILWAY_ENVIRONMENT) {
+    // In Railway, trust the first proxy
+    app.set('trust proxy', 1);
+} else {
+    // Local development - no proxy
+    app.set('trust proxy', false);
+}
 const PORT = process.env.PORT || 8080;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
