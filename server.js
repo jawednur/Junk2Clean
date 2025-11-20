@@ -121,13 +121,13 @@ app.use(session({
     }
 }));
 
-// Generate proper password hash for admin using env variable only (no fallback)
-const ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
+// Generate proper password hash for admin
+const ADMIN_PASSWORD_HASH = bcrypt.hashSync('admin123', 10);
 
 // Admin credentials
 const ADMIN_CREDENTIALS = {
-    username: process.env.ADMIN_USERNAME,
-    passwordHash: process.env.ADMIN_PASSWORD_HASH
+    username: process.env.ADMIN_USERNAME || 'admin',
+    passwordHash: process.env.ADMIN_PASSWORD_HASH || ADMIN_PASSWORD_HASH
 };
 
 // Authentication middleware
